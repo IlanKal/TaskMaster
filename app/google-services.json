@@ -1,26 +1,44 @@
 {
   "project_info": {
-    "project_number": "307987997511",
-    "project_id": "taskmaster-ee452",
-    "storage_bucket": "taskmaster-ee452.appspot.com"
+    "project_number": "714143330588",
+    "project_id": "taskmaster-d4a97",
+    "storage_bucket": "taskmaster-d4a97.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:307987997511:android:9cce0e8763a68ba5d3a262",
+        "mobilesdk_app_id": "1:714143330588:android:53059b3ab46343077e8ad9",
         "android_client_info": {
           "package_name": "dev.ilankal.taskmaster"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "714143330588-00idqmjth9qjppbuh8mrsmpirqg8suns.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dev.ilankal.taskmaster",
+            "certificate_hash": "4e8b0dc6dae54c1bfcc5a76448f268d89aab3ee4"
+          }
+        },
+        {
+          "client_id": "714143330588-13apalll5c69qbchekq4gouvpvpup1uo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyDscuUX7J7OANN6KSxdWidkm0k_H0qvgkI"
+          "current_key": "AIzaSyAzXIDdx3pWNztW5Ysj-w_NDVCtKYsPJnQ"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "714143330588-13apalll5c69qbchekq4gouvpvpup1uo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

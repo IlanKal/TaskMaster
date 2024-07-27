@@ -8,8 +8,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    //my colors
-    <color name="Medium_slate_blue">#655FF1</color>
-    <color name="light_sky_blue">#6ee2f5</color>
+    // my colors
+    <color name="cornflower_blue">#655FF1</color>
+    <color name="malibu">#6CBEF4</color>
 
 </resources>

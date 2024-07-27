@@ -18,11 +18,11 @@
                 android:type="linear"
                 >
                 <item
-                    android:color="@color/light_sky_blue"
+                    android:color="@color/malibu"
                     android:offset="0.0"
                     />
                 <item
-                    android:color="@color/Medium_slate_blue"
+                    android:color="@color/cornflower_blue"
                     android:offset="1.0"
                     />
             </gradient>
