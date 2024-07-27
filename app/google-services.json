@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "307987997511",
+    "project_id": "taskmaster-ee452",
+    "storage_bucket": "taskmaster-ee452.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:307987997511:android:9cce0e8763a68ba5d3a262",
+        "android_client_info": {
+          "package_name": "dev.ilankal.taskmaster"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDscuUX7J7OANN6KSxdWidkm0k_H0qvgkI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
