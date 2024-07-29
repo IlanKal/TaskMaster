@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">TaskMaster</string>
+    <string name="title_tasks">Tasks</string>
     <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_calendar">Calendar</string>
     <string name="logo_desc">TaskMaster Logo</string>
     <string name="welcome_text">Welcome to TaskMaster</string>
     <string name="description_text">Manage your tasks efficiently and effectively</string>

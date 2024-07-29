@@ -1,4 +1,4 @@
-package dev.ilankal.taskmaster.ui.notifications;
+package dev.ilankal.taskmaster.ui.calendar;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,21 +10,22 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import dev.ilankal.taskmaster.databinding.FragmentNotificationsBinding;
+import dev.ilankal.taskmaster.databinding.FragmentCalendarBinding;
 
-public class NotificationsFragment extends Fragment {
 
-    private FragmentNotificationsBinding binding;
+public class CalendarFragment extends Fragment {
+
+    private FragmentCalendarBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        NotificationsViewModel notificationsViewModel =
-                new ViewModelProvider(this).get(NotificationsViewModel.class);
+        CalendarViewModel notificationsViewModel =
+                new ViewModelProvider(this).get(CalendarViewModel.class);
 
-        binding = FragmentNotificationsBinding.inflate(inflater, container, false);
+        binding = FragmentCalendarBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textNotifications;
+        final TextView textView = binding.textCalendar;
         notificationsViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
