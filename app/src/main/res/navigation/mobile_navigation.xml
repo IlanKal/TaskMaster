@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/navigation_tasks"
-        android:name="dev.ilankal.taskmaster.ui.tasks.TasksFragment"
+        android:name="dev.ilankal.taskmaster.ui.Fragments.TasksFragment"
         android:label="@string/title_tasks"
         tools:layout="@layout/fragment_tasks" />
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="dev.ilankal.taskmaster.ui.home.HomeFragment"
+        android:name="dev.ilankal.taskmaster.ui.Fragments.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/navigation_calendar"
-        android:name="dev.ilankal.taskmaster.ui.calendar.CalendarFragment"
+        android:name="dev.ilankal.taskmaster.ui.Fragments.CalendarFragment"
         android:label="@string/title_calendar"
         tools:layout="@layout/fragment_calendar" />
 </navigation>

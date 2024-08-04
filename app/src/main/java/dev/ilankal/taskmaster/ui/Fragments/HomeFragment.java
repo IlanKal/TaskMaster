@@ -1,4 +1,4 @@
-package dev.ilankal.taskmaster.ui.tasks;
+package dev.ilankal.taskmaster.ui.Fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,22 +10,22 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import dev.ilankal.taskmaster.databinding.FragmentTasksBinding;
+import dev.ilankal.taskmaster.databinding.FragmentHomeBinding;
 
-public class TasksFragment extends Fragment {
+public class HomeFragment extends Fragment {
 
-    private FragmentTasksBinding binding;
+    private FragmentHomeBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        TasksViewModel dashboardViewModel =
-                new ViewModelProvider(this).get(TasksViewModel.class);
+//        HomeViewModel homeViewModel =
+//                new ViewModelProvider(this).get(HomeViewModel.class);
 
-        binding = FragmentTasksBinding.inflate(inflater, container, false);
+        binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textTasks;
-        dashboardViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        final TextView textView = binding.textHome;
+//        homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 
