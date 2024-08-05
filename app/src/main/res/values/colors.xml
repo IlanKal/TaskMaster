@@ -7,9 +7,13 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="red">#D14646</color>
+
 
     // my colors
     <color name="cornflower_blue">#655FF1</color>
     <color name="malibu">#6CBEF4</color>
+    <color name="light_blue">#e5effc</color>
+
 
 </resources>

@@ -16,6 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import dev.ilankal.taskmaster.Interfaces.RequestDb;
+import dev.ilankal.taskmaster.Interfaces.TaskCountsCallback;
 import dev.ilankal.taskmaster.ui.Models.Task;
 import dev.ilankal.taskmaster.ui.Models.TasksHashMap;
 
@@ -107,5 +108,50 @@ public class DataManager {
                         callback.onFailure(e);
                     }
                 });
+    }
+
+    public void getTaskCountsByUser(FirebaseUser user, TaskCountsCallback callback) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference usersRef = database.getReference("users").child(user.getUid()).child("allTasks");
+
+        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int completedTasks = 0;
+                int pendingTasks = 0;
+                int importantTasks = 0;
+                int urgentTasks = 0;
+                int optionalTasks = 0;
+
+                for (DataSnapshot taskSnapshot : snapshot.getChildren()) {
+                    Task task = taskSnapshot.getValue(Task.class);
+                    if (task != null) {
+                        if (task.isCompleted()) {
+                            completedTasks++;
+                        } else {
+                            pendingTasks++;
+                        }
+                        switch (task.getType()) {
+                            case IMPORTANT:
+                                importantTasks++;
+                                break;
+                            case URGENT:
+                                urgentTasks++;
+                                break;
+                            case OPTIONAL:
+                                optionalTasks++;
+                                break;
+                        }
+                    }
+                }
+
+                callback.onTaskCountsUpdated(completedTasks, pendingTasks, importantTasks, urgentTasks, optionalTasks);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError(error.toException());
+            }
+        });
     }
 }
