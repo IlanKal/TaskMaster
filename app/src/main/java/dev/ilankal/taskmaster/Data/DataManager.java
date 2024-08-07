@@ -154,4 +154,24 @@ public class DataManager {
             }
         });
     }
+    public void updateTaskCompletionStatus(FirebaseUser user, String taskId, boolean isCompleted, RequestDb callback) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference taskRef = database.getReference("users")
+                .child(user.getUid())
+                .child("allTasks")
+                .child(taskId);
+
+        taskRef.child("completed").setValue(isCompleted)
+                .addOnSuccessListener(aVoid -> {
+                    if (callback != null) {
+                        callback.onSuccess();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    if (callback != null) {
+                        callback.onFailure(e);
+                    }
+                });
+    }
+
 }
