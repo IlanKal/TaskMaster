@@ -1,94 +1,123 @@
 package dev.ilankal.taskmaster.ui.Fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
+import dev.ilankal.taskmaster.Adapter.TaskAdapter;
+import dev.ilankal.taskmaster.Data.DataManager;
+import dev.ilankal.taskmaster.Interfaces.TasksByDateCallback;
 import dev.ilankal.taskmaster.R;
+import dev.ilankal.taskmaster.TouchHelper;
 import dev.ilankal.taskmaster.databinding.FragmentCalendarBinding;
+import dev.ilankal.taskmaster.ui.Models.Task;
+
 public class CalendarFragment extends Fragment {
     private CalendarView calendarView;
+    private RecyclerView recyclerView;
+    private FirebaseUser currentUser;
+    private TaskAdapter taskAdapter;
     private Calendar calendar;
     private FragmentCalendarBinding binding;
+    private String currentDate;
+    private List<Task> taskList;
+
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentCalendarBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        findVies(root);
+        // Initialize currentUser
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            // Handle the case where the user is not logged in
+            // You might want to redirect the user to the login screen or show an error
+            return root;
+        }
+
+        findViews(root);
         initViews();
 
         return root;
     }
 
-    private void findVies(View root) {
+    private void findViews(View root) {
         calendarView = root.findViewById(R.id.calendarView);
         calendar = Calendar.getInstance();
+        recyclerView = root.findViewById(R.id.RecyclerViewCalender);
     }
+
     private void initViews() {
+        taskList = new ArrayList<>();
+
+        // give the data at the first time before click
+        long selectedDateInMillis = calendarView.getDate();
+        Date currentDateDate = new Date(selectedDateInMillis);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("d/M/yyyy", Locale.getDefault());
+        currentDate = dateFormat.format(currentDateDate);
+        loadTasksByDate();
+
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        taskAdapter = new TaskAdapter(taskList, currentUser, getChildFragmentManager(), getContext());
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new TouchHelper(taskAdapter, getContext()));
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+        recyclerView.setAdapter(taskAdapter);
+
         currentDate();
-        getDate();
-        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            @Override
-            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int day) {
-                Toast.makeText(getActivity(), dateView(day, month, year), Toast.LENGTH_LONG).show();
-            }
+        calendarView.setOnDateChangeListener((view, year, month, day) -> {
+            currentDate = dateView(day, month, year);
+            loadTasksByDate();
         });
     }
 
     private String dateView(int day, int month, int year) {
-        String str;
-        if (day < 10){
-            str = "0" + day;
-        }
-        else {
-            str = "" + day;
-        }
-        if (month < 10){
-            str += "/0" +(month +1);
-        }
-        else {
-            str += "/" + (month +1);
-        }
-        str += "/" + year;
-
-        return str;
-    }
-    public void getDate(){
-        long date = calendarView.getDate();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yy", Locale.getDefault());
-        calendar.setTimeInMillis(date);
-        String selectedDate = simpleDateFormat.format(calendar.getTime());
-        Toast.makeText(getActivity(),selectedDate,Toast.LENGTH_SHORT).show();
-    }
-    public void currentDate(){
-        long time = calendar.getTimeInMillis();
-        calendarView.setDate(time);
+        return day + "/" + (month + 1) + "/" + year;
     }
 
-    // maybe i will use
-    public void setDate(int day, int month, int year){
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month - 1);
-        calendar.set(Calendar.DAY_OF_MONTH, day);
-        long time = calendar.getTimeInMillis();
-        calendarView.setDate(time);
+    private void currentDate() {
+        calendarView.setDate(System.currentTimeMillis(), false, true);
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
+    private void loadTasksByDate() {
+        if (currentUser == null) return;
+
+        DataManager.getInstance().getTasksByDate(currentUser, currentDate, new TasksByDateCallback() {
+            @Override
+            public void onTasksRetrieved(List<Task> tasks) {
+                taskList.clear();
+                taskList.addAll(tasks);
+                taskAdapter.notifyDataSetChanged();
+                Log.d("CalenderFragment", taskList.toString());
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // Handle error
+            }
+        });
     }
+
 }

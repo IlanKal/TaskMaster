@@ -1,6 +1,5 @@
 package dev.ilankal.taskmaster.Data;
 
-
 import android.content.Context;
 import android.util.Log;
 
@@ -15,8 +14,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import dev.ilankal.taskmaster.Interfaces.RequestDb;
 import dev.ilankal.taskmaster.Interfaces.TaskCountsCallback;
+import dev.ilankal.taskmaster.Interfaces.TasksByDateCallback;
 import dev.ilankal.taskmaster.ui.Models.Task;
 import dev.ilankal.taskmaster.ui.Models.TasksHashMap;
 
@@ -53,9 +59,8 @@ public class DataManager {
                     Log.d("DB", "User ID already exists");
                     callback.onSuccess();
                 } else {
-
-                    TasksHashMap newBusinessActivityHashMap = new TasksHashMap(user.getUid());
-                    usersRef.child(user.getUid()).setValue(newBusinessActivityHashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    TasksHashMap newTasksHashMap = new TasksHashMap(user.getUid());
+                    usersRef.child(user.getUid()).setValue(newTasksHashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
                             Log.d("DB", "onSuccess");
@@ -77,6 +82,30 @@ public class DataManager {
             }
         });
     }
+    public void getTasksByDate(FirebaseUser user, String date, TasksByDateCallback callback) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference tasksRef = database.getReference("users").child(user.getUid()).child("allTasks");
+
+        tasksRef.orderByChild("date").equalTo(date).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Task> tasks = new ArrayList<>();
+                for (DataSnapshot taskSnapshot : snapshot.getChildren()) {
+                    Task task = taskSnapshot.getValue(Task.class);
+                    if (task != null) {
+                        tasks.add(task);
+                    }
+                }
+                callback.onTasksRetrieved(tasks);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError(error.toException());
+            }
+        });
+    }
+
 
     public void addNewTaskByUser(FirebaseUser user, RequestDb callback, Task task){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -91,7 +120,7 @@ public class DataManager {
         // Get the generated unique key
         String taskId = newTaskRef.getKey();
 
-        // Set the ID in the BusinessActivity object
+        // Set the ID in the Task object
         task.setId(taskId);
 
         // Set the value of the task
@@ -154,6 +183,41 @@ public class DataManager {
             }
         });
     }
+    public void loadTasksForUser(FirebaseUser user, TasksByDateCallback callback) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference tasksRef = database.getReference("users").child(user.getUid()).child("allTasks");
+
+        tasksRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Task> tasks = new ArrayList<>();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
+
+                for (DataSnapshot taskSnapshot : snapshot.getChildren()) {
+                    Task task = taskSnapshot.getValue(Task.class);
+                    if (task != null) {
+                        tasks.add(task);
+                    }
+                }
+
+                // Sort the taskList by date in ascending order
+                Collections.sort(tasks, (task1, task2) -> {
+                    LocalDate date1 = LocalDate.parse(task1.getDate(), formatter);
+                    LocalDate date2 = LocalDate.parse(task2.getDate(), formatter);
+                    return date1.compareTo(date2);
+                });
+
+                callback.onTasksRetrieved(tasks);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError(error.toException());
+            }
+        });
+    }
+
+
     public void updateTaskCompletionStatus(FirebaseUser user, String taskId, boolean isCompleted, RequestDb callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference taskRef = database.getReference("users")
@@ -174,4 +238,43 @@ public class DataManager {
                 });
     }
 
+    public void deleteTaskByUser(FirebaseUser user, String taskId, RequestDb callback) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference taskRef = database.getReference("users")
+                .child(user.getUid())
+                .child("allTasks")
+                .child(taskId);
+
+        taskRef.removeValue()
+                .addOnSuccessListener(aVoid -> {
+                    if (callback != null) {
+                        callback.onSuccess();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    if (callback != null) {
+                        callback.onFailure(e);
+                    }
+                });
+    }
+
+    public void updateTaskByUser(FirebaseUser user, Task updatedTask, RequestDb callback) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference taskRef = database.getReference("users")
+                .child(user.getUid())
+                .child("allTasks")
+                .child(updatedTask.getId());
+
+        taskRef.setValue(updatedTask)
+                .addOnSuccessListener(aVoid -> {
+                    if (callback != null) {
+                        callback.onSuccess();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    if (callback != null) {
+                        callback.onFailure(e);
+                    }
+                });
+    }
 }

@@ -60,5 +60,8 @@ dependencies {
     // Firebase realtime database
     implementation(libs.firebase.database)
 
+    // Recyclerview swipedecorator
+    implementation (libs.recyclerview.swipedecorator)
+
 
 }
