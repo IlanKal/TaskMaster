@@ -2,12 +2,15 @@
 package dev.ilankal.taskmaster.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentManager;
@@ -99,13 +102,22 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Task task = taskList.get(position);
 
+        // Detach listener to avoid it being triggered during setChecked
+        holder.mcheckbox.setOnCheckedChangeListener(null);
+
+        // Set the state
         holder.mcheckbox.setText(task.getDescription());
         holder.date_tv.setText(task.getDate());
         holder.category_tv.setText("Category: " + task.getCategoryString());
         holder.type_tv.setText("Type: " + task.getTypeString());
         holder.mcheckbox.setChecked(task.isCompleted());
 
+        // Reattach listener
         holder.mcheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            // Update the task's completed state
+            task.setCompleted(isChecked);
+
+            // Update the task in the database
             DataManager.getInstance().updateTaskCompletionStatus(currentUser, task.getId(), isChecked, new RequestDb() {
                 @Override
                 public void onSuccess() {
@@ -115,8 +127,26 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
                 @Override
                 public void onFailure(Exception e) {
                     Log.d("Adapter", "Failed to update task completion status.", e);
+                    Toast.makeText(context, "Error updating task status", Toast.LENGTH_SHORT).show();
                 }
             });
+        });
+
+        holder.shareButton.setOnClickListener(v -> {
+            String shareText = "Task: " + task.getDescription() + "\n" +
+                    "Date: " + task.getDate() + "\n" +
+                    "Category: " + task.getCategoryString() + "\n" +
+                    "Type: " + task.getTypeString() + "\n\n" +
+                    "Shared via TaskMaster: Manage your tasks efficiently and effectively";
+
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_SEND);
+            intent.putExtra(Intent.EXTRA_TEXT, shareText);
+            intent.setType("text/plain");
+
+            if (intent.resolveActivity(context.getPackageManager()) != null) {
+                context.startActivity(intent);
+            }
         });
     }
 
@@ -130,6 +160,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
         private TextView date_tv;
         private TextView category_tv;
         private TextView type_tv;
+        private ImageView shareButton;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -137,6 +168,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
             date_tv = itemView.findViewById(R.id.date_tv);
             category_tv = itemView.findViewById(R.id.category_tv);
             type_tv = itemView.findViewById(R.id.type_tv);
+            shareButton = itemView.findViewById(R.id.shareButton);
         }
     }
 }
