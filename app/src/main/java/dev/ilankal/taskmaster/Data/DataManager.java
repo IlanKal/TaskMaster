@@ -21,7 +21,9 @@ import java.util.Collections;
 import java.util.List;
 
 import dev.ilankal.taskmaster.Interfaces.RequestDb;
-import dev.ilankal.taskmaster.Interfaces.TaskCountsCallback;
+import dev.ilankal.taskmaster.Interfaces.TaskCountsByCategoryCallback;
+import dev.ilankal.taskmaster.Interfaces.TaskCountsByTypeCallback;
+import dev.ilankal.taskmaster.Interfaces.TaskCountsByUserCallback;
 import dev.ilankal.taskmaster.Interfaces.TasksByDateCallback;
 import dev.ilankal.taskmaster.ui.Models.Task;
 import dev.ilankal.taskmaster.ui.Models.TasksHashMap;
@@ -139,7 +141,7 @@ public class DataManager {
                 });
     }
 
-    public void getTaskCountsByUser(FirebaseUser user, TaskCountsCallback callback) {
+    public void getCompletedAndPendingTasks(FirebaseUser user, TaskCountsByUserCallback callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference usersRef = database.getReference("users").child(user.getUid()).child("allTasks");
 
@@ -148,9 +150,6 @@ public class DataManager {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 int completedTasks = 0;
                 int pendingTasks = 0;
-                int importantTasks = 0;
-                int urgentTasks = 0;
-                int optionalTasks = 0;
 
                 for (DataSnapshot taskSnapshot : snapshot.getChildren()) {
                     Task task = taskSnapshot.getValue(Task.class);
@@ -160,6 +159,33 @@ public class DataManager {
                         } else {
                             pendingTasks++;
                         }
+                    }
+                }
+
+                callback.onTaskCountsByUserUpdated(completedTasks, pendingTasks);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError(error.toException());
+            }
+        });
+    }
+
+    public void getTaskCountsByType(FirebaseUser user, TaskCountsByTypeCallback callback) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference usersRef = database.getReference("users").child(user.getUid()).child("allTasks");
+
+        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int importantTasks = 0;
+                int urgentTasks = 0;
+                int optionalTasks = 0;
+
+                for (DataSnapshot taskSnapshot : snapshot.getChildren()) {
+                    Task task = taskSnapshot.getValue(Task.class);
+                    if (task != null) {
                         switch (task.getType()) {
                             case IMPORTANT:
                                 importantTasks++;
@@ -174,7 +200,7 @@ public class DataManager {
                     }
                 }
 
-                callback.onTaskCountsUpdated(completedTasks, pendingTasks, importantTasks, urgentTasks, optionalTasks);
+                callback.onTaskCountsByTypeUpdated(importantTasks, urgentTasks, optionalTasks);
             }
 
             @Override
@@ -183,6 +209,53 @@ public class DataManager {
             }
         });
     }
+
+    public void getTaskCountsByCategory(FirebaseUser user, TaskCountsByCategoryCallback callback) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference usersRef = database.getReference("users").child(user.getUid()).child("allTasks");
+
+        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int workTasks = 0;
+                int personalTasks = 0;
+                int homeTasks = 0;
+                int fitnessTasks = 0;
+                int otherTasks = 0;
+
+                for (DataSnapshot taskSnapshot : snapshot.getChildren()) {
+                    Task task = taskSnapshot.getValue(Task.class);
+                    if (task != null) {
+                        switch (task.getCategory()) {
+                            case WORK:
+                                workTasks++;
+                                break;
+                            case PERSONAL:
+                                personalTasks++;
+                                break;
+                            case HOME:
+                                homeTasks++;
+                                break;
+                            case FITNESS:
+                                fitnessTasks++;
+                                break;
+                            case OTHER:
+                                otherTasks++;
+                                break;
+                        }
+                    }
+                }
+
+                callback.onTaskCountsByCategoryUpdated(workTasks, personalTasks, homeTasks, fitnessTasks, otherTasks);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError(error.toException());
+            }
+        });
+    }
+
     public void loadTasksForUser(FirebaseUser user, TasksByDateCallback callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference tasksRef = database.getReference("users").child(user.getUid()).child("allTasks");

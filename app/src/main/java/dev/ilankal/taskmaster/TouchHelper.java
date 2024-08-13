@@ -12,9 +12,11 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import dev.ilankal.taskmaster.Adapter.TaskAdapter;
+import dev.ilankal.taskmaster.Utilities.SoundPlayer;
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
 public class TouchHelper extends ItemTouchHelper.SimpleCallback {
+    private SoundPlayer soundPlayer;
     private TaskAdapter taskAdapter;
     private Context context;
 
@@ -32,7 +34,12 @@ public class TouchHelper extends ItemTouchHelper.SimpleCallback {
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
         final int pos = viewHolder.getBindingAdapterPosition();
+
+        // Initialize the SoundPlayer
+        soundPlayer = new SoundPlayer(context);
+
         if (direction == ItemTouchHelper.RIGHT) {
+            soundPlayer.playSound(R.raw.delete_sound, false);
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setMessage("Are you sure?")
                     .setPositiveButton("Yes", (dialog, which) -> taskAdapter.deleteTask(pos))

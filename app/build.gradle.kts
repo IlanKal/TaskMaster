@@ -63,5 +63,11 @@ dependencies {
     // Recyclerview swipedecorator
     implementation (libs.recyclerview.swipedecorator)
 
+    // Lottie:
+    implementation (libs.lottie)
+
+    // MavenChart
+    implementation (libs.mpandroidchart)
+
 
 }

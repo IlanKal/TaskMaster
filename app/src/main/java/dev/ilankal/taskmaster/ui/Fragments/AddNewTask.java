@@ -32,12 +32,13 @@ import dev.ilankal.taskmaster.Enum.Category;
 import dev.ilankal.taskmaster.Enum.Type;
 import dev.ilankal.taskmaster.Interfaces.RequestDb;
 import dev.ilankal.taskmaster.R;
+import dev.ilankal.taskmaster.SplashActivity;
+import dev.ilankal.taskmaster.Utilities.SoundPlayer;
 import dev.ilankal.taskmaster.ui.Models.Task;
 
 public class AddNewTask extends BottomSheetDialogFragment {
-
+    private SoundPlayer soundPlayer;
     public static final String TAG = "AddNewTask";
-
     private EditText taskDescription;
     private Button pickDateButton;
     private Spinner categorySpinner;
@@ -65,6 +66,8 @@ public class AddNewTask extends BottomSheetDialogFragment {
         super.onViewCreated(view, savedInstanceState);
         findViews(view);
 
+        soundPlayer = new SoundPlayer(getContext());
+
         databaseReference = FirebaseDatabase.getInstance().getReference("tasks");
         boolean isUpdate = false;
 
@@ -85,7 +88,7 @@ public class AddNewTask extends BottomSheetDialogFragment {
             typeSpinner.setSelection(((ArrayAdapter<Type>) typeSpinner.getAdapter()).getPosition(Type.valueOf(type)));
 
             saveButton.setEnabled(true);  // Enable save button for editing
-            saveButton.setBackgroundColor(getResources().getColor(R.color.malibu));  // Set to enabled color
+            saveButton.setBackgroundColor(getResources().getColor(R.color.cornflower_blue));  // Set to enabled color
 
             taskDescription.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -94,7 +97,7 @@ public class AddNewTask extends BottomSheetDialogFragment {
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     saveButton.setEnabled(!s.toString().trim().isEmpty());
-                    saveButton.setBackgroundColor(s.toString().trim().isEmpty() ? Color.GRAY : getResources().getColor(R.color.malibu));
+                    saveButton.setBackgroundColor(s.toString().trim().isEmpty() ? Color.GRAY : getResources().getColor(R.color.cornflower_blue));
                 }
 
                 @Override
@@ -104,7 +107,10 @@ public class AddNewTask extends BottomSheetDialogFragment {
 
         pickDateButton.setOnClickListener(v -> showDatePickerDialog());
         boolean finalIsUpdate = isUpdate;
-        saveButton.setOnClickListener(v -> saveTask(finalIsUpdate));
+        saveButton.setOnClickListener(v -> {
+            saveTask(finalIsUpdate);
+            soundPlayer.playSound(R.raw.task_save, false);
+        });
     }
 
     private void findViews(View view) {
@@ -159,6 +165,7 @@ public class AddNewTask extends BottomSheetDialogFragment {
         Category category = (Category) categorySpinner.getSelectedItem();
         Type type = (Type) typeSpinner.getSelectedItem();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
 
         if (user == null) {
             Toast.makeText(getContext(), "User not authenticated", Toast.LENGTH_SHORT).show();
