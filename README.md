@@ -26,14 +26,13 @@ Key components include:
 
 ## Screenshots
 
-Home Page:
-![image](https://github.com/user-attachments/assets/53c6be5a-fac2-45b2-867d-74c3ff9f08c1)
+## Home Page:
+<img src="https://github.com/user-attachments/assets/53c6be5a-fac2-45b2-867d-74c3ff9f08c1" alt="Home Page" width="400"/>
 
-Tasks Page:
-![image](https://github.com/user-attachments/assets/919ed8d7-e8d8-4639-845b-ab76ba2239ff)
+## Tasks Page:
+<img src="https://github.com/user-attachments/assets/919ed8d7-e8d8-4639-845b-ab76ba2239ff" alt="Tasks Page" width="400"/>
 
-Calender page:
-![image](https://github.com/user-attachments/assets/2cb67dcd-abfc-4c43-a7af-7f74081cd58c)
-
+## Calendar Page:
+<img src="https://github.com/user-attachments/assets/2cb67dcd-abfc-4c43-a7af-7f74081cd58c" alt="Calendar Page" width="400"/>
 
 
