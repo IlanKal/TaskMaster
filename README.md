@@ -35,4 +35,10 @@ Key components include:
 ## Calendar Page:
 <img src="https://github.com/user-attachments/assets/2cb67dcd-abfc-4c43-a7af-7f74081cd58c" alt="Calendar Page" width="400"/>
 
+# Video Example
+Link: [App preview.mp4]([https://github.com/IlanKal/HW_2_Android/blob/master/Game%20preview.mp4](https://github.com/IlanKal/TaskMaster/blob/master/TaskMaster%20-%20Final%20project_.mp4))
+
+
+
+
 
