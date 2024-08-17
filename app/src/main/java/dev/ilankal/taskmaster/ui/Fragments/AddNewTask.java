@@ -46,7 +46,6 @@ public class AddNewTask extends BottomSheetDialogFragment {
     private Button saveButton;
     private Context context;
     private DatabaseReference databaseReference;
-    private String dueDate = "";
     private String id = "";
     private String dueDateUpdate = "";
     private Task currentTask;

@@ -50,11 +50,6 @@ public class CalendarFragment extends Fragment {
 
         // Initialize currentUser
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser == null) {
-            // Handle the case where the user is not logged in
-            // You might want to redirect the user to the login screen or show an error
-            return root;
-        }
 
         findViews(root);
         initViews();
@@ -110,7 +105,6 @@ public class CalendarFragment extends Fragment {
                 taskList.clear();
                 taskList.addAll(tasks);
                 taskAdapter.notifyDataSetChanged();
-                Log.d("CalenderFragment", taskList.toString());
             }
 
             @Override

@@ -36,6 +36,7 @@ public class DataManager {
         this.context = context;
     }
 
+    // Initializes the singleton instance of DataManager
     public static DataManager init(Context context){
         if (instance == null) {
             synchronized (DataManager.class){
@@ -47,31 +48,33 @@ public class DataManager {
         return getInstance();
     }
 
+    // Returns the singleton instance of DataManager
     public static DataManager getInstance() {
         return instance;
     }
 
+    // Adds a new user to the Firebase database
     public void addUserToDB(FirebaseUser user, RequestDb callback){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference usersRef = database.getReference("users");
+
+        // Check if the user already exists in the database
         usersRef.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    Log.d("DB", "User ID already exists");
                     callback.onSuccess();
                 } else {
+                    // Create a new TasksHashMap for the new user
                     TasksHashMap newTasksHashMap = new TasksHashMap(user.getUid());
                     usersRef.child(user.getUid()).setValue(newTasksHashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            Log.d("DB", "onSuccess");
                             callback.onSuccess();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Log.d("DB", "onFailure", e);
                             callback.onFailure(e);
                         }
                     });
@@ -79,15 +82,17 @@ public class DataManager {
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.d("DB", "Database error: " + error.getMessage());
                 callback.onFailure(error.toException());
             }
         });
     }
+
+    // Retrieves tasks for a specific date
     public void getTasksByDate(FirebaseUser user, String date, TasksByDateCallback callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference tasksRef = database.getReference("users").child(user.getUid()).child("allTasks");
 
+        // Query the database for tasks with the specific date
         tasksRef.orderByChild("date").equalTo(date).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -98,7 +103,7 @@ public class DataManager {
                         tasks.add(task);
                     }
                 }
-                callback.onTasksRetrieved(tasks);
+                callback.onTasksRetrieved(tasks);  // Return the list of tasks
             }
 
             @Override
@@ -109,6 +114,7 @@ public class DataManager {
     }
 
 
+    // Adds a new task for the user
     public void addNewTaskByUser(FirebaseUser user, RequestDb callback, Task task){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference usersRef = database.getReference("users");
@@ -128,23 +134,23 @@ public class DataManager {
         // Set the value of the task
         newTaskRef.setValue(task)
                 .addOnSuccessListener(aVoid -> {
-                    // Handle success, e.g., notify the callback
                     if (callback != null) {
                         callback.onSuccess();
                     }
                 })
                 .addOnFailureListener(e -> {
-                    // Handle failure, e.g., notify the callback with an error
                     if (callback != null) {
                         callback.onFailure(e);
                     }
                 });
     }
 
+    // Retrieves counts of completed and pending tasks
     public void getCompletedAndPendingTasks(FirebaseUser user, TaskCountsByUserCallback callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference usersRef = database.getReference("users").child(user.getUid()).child("allTasks");
 
+        // Query the database to retrieve tasks and count completed and pending tasks
         usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -172,10 +178,12 @@ public class DataManager {
         });
     }
 
+    // Retrieves counts of tasks by type (e.g., IMPORTANT, URGENT, OPTIONAL)
     public void getTaskCountsByType(FirebaseUser user, TaskCountsByTypeCallback callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference usersRef = database.getReference("users").child(user.getUid()).child("allTasks");
 
+        // Query the database to retrieve tasks and count by type
         usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -210,10 +218,12 @@ public class DataManager {
         });
     }
 
+    // Retrieves counts of tasks by category (e.g., WORK, PERSONAL, HOME, FITNESS, OTHER)
     public void getTaskCountsByCategory(FirebaseUser user, TaskCountsByCategoryCallback callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference usersRef = database.getReference("users").child(user.getUid()).child("allTasks");
 
+        // Query the database to retrieve tasks and count by category
         usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -256,10 +266,12 @@ public class DataManager {
         });
     }
 
+    // Loads all tasks for the user, sorted by date
     public void loadTasksForUser(FirebaseUser user, TasksByDateCallback callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference tasksRef = database.getReference("users").child(user.getUid()).child("allTasks");
 
+        // Query the database to retrieve all tasks
         tasksRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -291,6 +303,7 @@ public class DataManager {
     }
 
 
+    // Update status of task
     public void updateTaskCompletionStatus(FirebaseUser user, String taskId, boolean isCompleted, RequestDb callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference taskRef = database.getReference("users")

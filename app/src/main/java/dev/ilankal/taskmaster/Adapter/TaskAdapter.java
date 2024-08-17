@@ -30,7 +30,6 @@ import dev.ilankal.taskmaster.ui.Fragments.AddNewTask;
 import dev.ilankal.taskmaster.ui.Models.Task;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> {
-
     private List<Task> taskList;
     private FirebaseUser currentUser;
     private DatabaseReference databaseReference;
@@ -56,13 +55,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
     }
 
     public void deleteTask(int pos) {
-        if (pos >= 0 && pos < taskList.size()) {  // Ensure the index is valid
-            Task task = taskList.get(pos);  // Get the task at the position
+        if (pos >= 0 && pos < taskList.size()) {
+            Task task = taskList.get(pos);
 
             Log.d("TaskAdapter", "Attempting to delete task at position: " + pos + " with ID: " + task.getId());
             Log.d("TaskAdapter", "Current task list size before deletion: " + taskList.size());
 
-            // Immediately remove the item from the list and notify the adapter
             taskList.remove(pos);
             notifyItemRemoved(pos);
 
@@ -76,9 +74,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
                 public void onFailure(Exception e) {
                     Log.d("TaskAdapter", "Failed to delete task.", e);
 
-                    // Optionally, you can reinsert the item if deletion fails
-                    taskList.add(pos, task);
-                    notifyItemInserted(pos);
                 }
             });
         } else {
@@ -102,10 +97,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Task task = taskList.get(position);
 
-        // Detach listener to avoid it being triggered during setChecked
         holder.mcheckbox.setOnCheckedChangeListener(null);
-
-        // Set the state
         holder.mcheckbox.setText(task.getDescription());
         holder.date_tv.setText(task.getDate());
         holder.category_tv.setText("Category: " + task.getCategoryString());
@@ -114,7 +106,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
 
         // Reattach listener
         holder.mcheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            // Update the task's completed state
+
             task.setCompleted(isChecked);
 
             // Update the task in the database
